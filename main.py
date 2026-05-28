@@ -1,4 +1,5 @@
-# main.py
+from vision.camera import run_camera
+
 
 def main():
     print("PoseGuard Start")
@@ -14,6 +15,7 @@ def main():
     # 5. 결과 저장
 
     # 6. 그래프 및 AI 코멘트 출력
+    run_camera()
 
 
 if __name__ == "__main__":
