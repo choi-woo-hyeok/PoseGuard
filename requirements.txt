@@ -1,0 +1,7 @@
+opencv-python
+mediapipe
+matplotlib
+firebase-admin
+google-generativeai
+numpy
+pillow
