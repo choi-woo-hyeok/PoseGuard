@@ -8,4 +8,13 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-print("Firebase Connected!")
+session_data = {
+    "uid": "test_user",
+    "posture_score": 87,
+    "warning_count": 2,
+    "created_at": "2026-05-28"
+}
+
+db.collection("sessions").add(session_data)
+
+print("Session Data Saved!")
