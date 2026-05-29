@@ -1,13 +1,37 @@
 import tkinter as tk
 from tkinter import messagebox
 
+from vision.pose_detector import get_pose_data
+from logic.posture_logic import analyze_posture
+from logic.gemini_advisor import get_posture_comment
+
 def show_warning(message):
     messagebox.showwarning("자세 경고", message)
 
 def start_monitoring():
     guide_msg = "정확한 측정을 위해 측정 중에는 어깨와 상체 위치를 고정하고, 카메라와의 거리를 유지해주세요. 앞뒤로 움직이지 마세요."
     messagebox.showinfo("안내", guide_msg)
-    print("웹캠 및 MediaPipe 구동 시작...")
+
+    try:
+        # 테스트용 가짜 데이터
+        pose_data = {
+            "left_ear": (100, 100),
+            "right_ear": (150, 100),
+            "left_shoulder": (100, 200),
+            "right_shoulder": (150, 200)
+        }
+
+        result = analyze_posture(pose_data)
+
+        comment = get_posture_comment(result)
+
+        if result["is_bad_posture"]:
+            show_warning(comment)
+        else:
+            messagebox.showinfo("AI 코멘트", comment)
+
+    except Exception as e:
+        messagebox.showerror("오류", str(e))
 
 def stop_monitoring():
     messagebox.showinfo("종료", "프로그램을 종료하고 결과를 저장합니다.")
