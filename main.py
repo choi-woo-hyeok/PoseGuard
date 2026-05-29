@@ -1,19 +1,13 @@
-# main.py
+from vision.pose_detector import get_pose_data
+from logic.posture_logic import detect_forward_head
 
 def main():
-    print("PoseGuard Start")
 
-    # 1. 웹캠 실행
+    pose_data = get_pose_data()
 
-    # 2. pose_data 생성
+    result = detect_forward_head(pose_data)
 
-    # 3. 자세 분석
-
-    # 4. UI 출력
-
-    # 5. 결과 저장
-
-    # 6. 그래프 및 AI 코멘트 출력
+    print(result)
 
 
 if __name__ == "__main__":
