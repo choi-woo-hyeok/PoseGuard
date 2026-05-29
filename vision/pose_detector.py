@@ -1,3 +1,5 @@
+"""Pose landmark detection utilities for the vision module."""
+
 from __future__ import annotations
 
 from typing import Optional
@@ -29,6 +31,7 @@ class PoseDetector:
         )
 
     def close(self) -> None:
+        """Release MediaPipe pose resources."""
         self.pose.close()
 
     def process_frame(self, frame) -> tuple[object, Optional[PoseData]]:
@@ -61,6 +64,7 @@ class PoseDetector:
         frame_width: int,
         frame_height: int,
     ) -> Optional[PoseData]:
+        """Build project pose_data from MediaPipe landmarks."""
         left_ear = self._landmark_to_point(
             landmarks[self.mp_pose.PoseLandmark.LEFT_EAR],
             frame_width,
@@ -100,6 +104,7 @@ class PoseDetector:
         frame_width: int,
         frame_height: int,
     ) -> Optional[Point]:
+        """Convert a visible MediaPipe landmark to pixel coordinates."""
         if landmark.visibility < self.min_visibility:
             return None
 
@@ -116,4 +121,29 @@ def extract_pose_data(frame) -> Optional[PoseData]:
         return pose_data
     finally:
         detector.close()
+
+
+def get_pose_data(camera_index: int = 0, max_frames: int = 60) -> Optional[PoseData]:
+    """Capture webcam frames and return the first detected pose_data."""
+    capture = cv2.VideoCapture(camera_index)
+    if not capture.isOpened():
+        raise RuntimeError("Cannot open webcam. Check camera connection or index.")
+
+    detector = PoseDetector()
+
+    try:
+        for _ in range(max_frames):
+            success, frame = capture.read()
+            if not success:
+                continue
+
+            frame = cv2.flip(frame, 1)
+            _, pose_data = detector.process_frame(frame)
+            if pose_data is not None:
+                return pose_data
+
+        return None
+    finally:
+        detector.close()
+        capture.release()
 
