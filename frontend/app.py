@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
+from backend.firebase_service import save_session
 from vision.pose_detector import get_pose_data
 from logic.posture_logic import analyze_posture
 from logic.gemini_advisor import get_posture_comment
@@ -13,13 +14,7 @@ def start_monitoring():
     messagebox.showinfo("안내", guide_msg)
 
     try:
-        # 테스트용 가짜 데이터
-        pose_data = {
-            "left_ear": (100, 100),
-            "right_ear": (150, 100),
-            "left_shoulder": (100, 200),
-            "right_shoulder": (150, 200)
-        }
+        pose_data = get_pose_data()
 
         result = analyze_posture(pose_data)
 
@@ -34,8 +29,26 @@ def start_monitoring():
         messagebox.showerror("오류", str(e))
 
 def stop_monitoring():
-    messagebox.showinfo("종료", "프로그램을 종료하고 결과를 저장합니다.")
-    print("Firebase에 세션 데이터 저장 요청...")
+    try:
+        session_data = {
+            "uid": "test_user",
+            "posture_score": 87,
+            "warning_count": 2,
+            "created_at": "2026-05-30"
+        }
+
+        save_session(session_data)
+
+        messagebox.showinfo(
+            "저장 완료",
+            "세션 데이터가 Firebase에 저장되었습니다."
+        )
+
+    except Exception as e:
+        messagebox.showerror(
+            "저장 실패",
+            str(e)
+        )
 
 root = tk.Tk()
 root.title("PoseGuard")
