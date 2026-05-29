@@ -3,5 +3,6 @@ mediapipe
 matplotlib
 firebase-admin
 google-generativeai
+python-dotenv
 numpy
 pillow
