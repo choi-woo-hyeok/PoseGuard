@@ -5,18 +5,36 @@ from backend.firebase_service import save_session
 from vision.pose_detector import get_pose_data
 from logic.posture_logic import analyze_posture
 from logic.gemini_advisor import get_posture_comment
+from datetime import datetime
+
+warning_count = 0
+last_result = None
 
 def show_warning(message):
     messagebox.showwarning("자세 경고", message)
 
 def start_monitoring():
+    global warning_count
+    global last_result
+
     guide_msg = "정확한 측정을 위해 측정 중에는 어깨와 상체 위치를 고정하고, 카메라와의 거리를 유지해주세요. 앞뒤로 움직이지 마세요."
     messagebox.showinfo("안내", guide_msg)
 
     try:
         pose_data = get_pose_data()
 
+        if pose_data is None:
+            messagebox.showwarning(
+                "인식 실패",
+                "자세를 인식할 수 없습니다. 카메라 앞에 앉아 다시 시도해주세요."
+            )
+            return
+
         result = analyze_posture(pose_data)
+        last_result = result
+
+        if result["is_bad_posture"]:
+            warning_count += 1
 
         comment = get_posture_comment(result)
 
@@ -29,20 +47,31 @@ def start_monitoring():
         messagebox.showerror("오류", str(e))
 
 def stop_monitoring():
+    global warning_count
+    global last_result
+
     try:
+        posture_score = 100
+
+        if warning_count > 0:
+            posture_score = max(0, 100 - warning_count * 10)
+
         session_data = {
             "uid": "test_user",
-            "posture_score": 87,
-            "warning_count": 2,
-            "created_at": "2026-05-30"
+            "posture_score": posture_score,
+            "warning_count": warning_count,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
         save_session(session_data)
 
         messagebox.showinfo(
             "저장 완료",
-            "세션 데이터가 Firebase에 저장되었습니다."
+            f"자세 점수: {posture_score}\n경고 횟수: {warning_count}\nFirebase 저장 완료"
         )
+
+        warning_count = 0
+        last_result = None
 
     except Exception as e:
         messagebox.showerror(
