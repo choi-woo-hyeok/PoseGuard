@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from backend.firebase_service import save_session
-from vision.pose_detector import get_pose_data
+from vision.camera import run_camera
 from logic.posture_logic import analyze_posture
 from logic.gemini_advisor import get_posture_comment
 from datetime import datetime
@@ -21,7 +21,7 @@ def start_monitoring():
     messagebox.showinfo("안내", guide_msg)
 
     try:
-        pose_data = get_pose_data()
+        pose_data = run_camera()
 
         if pose_data is None:
             messagebox.showwarning(
@@ -63,7 +63,7 @@ def stop_monitoring():
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        save_session(session_data)
+        # save_session(session_data)
 
         messagebox.showinfo(
             "저장 완료",
@@ -74,10 +74,12 @@ def stop_monitoring():
         last_result = None
 
     except Exception as e:
+        print("저장 실패:", repr(e))
+
         messagebox.showerror(
             "저장 실패",
             str(e)
-        )
+    )
 
 root = tk.Tk()
 root.title("PoseGuard")
