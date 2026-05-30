@@ -63,7 +63,11 @@ def stop_monitoring():
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        # save_session(session_data)
+        print("Firebase 저장 시도")
+
+        save_session(session_data)
+
+        print("Firebase 저장 성공")
 
         messagebox.showinfo(
             "저장 완료",
