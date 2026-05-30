@@ -47,6 +47,8 @@ def _draw_pose_status(frame, pose_data: PoseData | None) -> None:
         )
         return
 
+    _draw_tracked_points(frame, pose_data)
+
     cv2.putText(
         frame,
         "Pose detected - press q to quit",
@@ -79,6 +81,32 @@ def _draw_pose_status(frame, pose_data: PoseData | None) -> None:
     )
 
 
+def _draw_tracked_points(frame, pose_data: PoseData) -> None:
+    point_styles = {
+        "left_ear": ((255, 0, 0), "LE"),
+        "right_ear": ((255, 0, 0), "RE"),
+        "left_shoulder": ((0, 255, 255), "LS"),
+        "right_shoulder": ((0, 255, 255), "RS"),
+    }
+
+    for key, (color, label) in point_styles.items():
+        point = pose_data[key]
+        if not isinstance(point, tuple):
+            continue
+
+        cv2.circle(frame, point, 9, color, -1)
+        cv2.circle(frame, point, 12, (255, 255, 255), 2)
+        cv2.putText(
+            frame,
+            label,
+            (point[0] + 10, point[1] - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            color,
+            2,
+            cv2.LINE_AA,
+        )
+
+
 if __name__ == "__main__":
     run_camera()
-

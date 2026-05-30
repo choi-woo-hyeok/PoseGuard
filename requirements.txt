@@ -1,7 +1,8 @@
-opencv-python
+# Tested with Python 3.12.9
+opencv-python==4.13.0.92
 mediapipe==0.10.21
-matplotlib
-firebase-admin
-google-generativeai
-numpy
-pillow
+matplotlib==3.10.9
+firebase-admin==7.4.0
+google-generativeai==0.8.6
+numpy==1.26.4
+pillow==12.2.0
