@@ -86,6 +86,10 @@ This project was tested with Python 3.12.9 / 3.12.10.
 
 MediaPipe 0.10.21 may not work properly on Python 3.13 or later.
 
+##Tested Environment:
+- Python 3.12.9 / 3.12.10
+- MediaPipe 0.10.21
+
 ## 참고 자료
 - MediaPipe (Google)
 - OpenCV
