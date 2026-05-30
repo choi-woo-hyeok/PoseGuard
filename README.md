@@ -80,6 +80,11 @@ PoseGuard는 노트북 웹캠을 활용하여 사용자의 상체 자세를 실�
 - 학습 집중력 향상
 - 데이터 기반 자기 관리 습관 형성
 
+## Python Version
+
+This project was tested with Python 3.12.9 / 3.12.10.
+
+MediaPipe 0.10.21 may not work properly on Python 3.13 or later.
 
 ## 참고 자료
 - MediaPipe (Google)
