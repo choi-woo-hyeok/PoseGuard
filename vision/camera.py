@@ -5,13 +5,14 @@ import cv2
 from vision.pose_detector import PoseDetector, PoseData
 
 
-def run_camera(camera_index: int = 0) -> None:
-    """Runs webcam capture and displays MediaPipe pose landmarks."""
+def run_camera(camera_index: int = 0):
+    """Runs webcam capture and returns pose_data when q is pressed."""
     capture = cv2.VideoCapture(camera_index)
     if not capture.isOpened():
         raise RuntimeError("Cannot open webcam. Check camera connection or index.")
 
     detector = PoseDetector()
+    last_pose_data = None
 
     try:
         while True:
@@ -21,12 +22,20 @@ def run_camera(camera_index: int = 0) -> None:
 
             frame = cv2.flip(frame, 1)
             annotated_frame, pose_data = detector.process_frame(frame)
+
+            if pose_data is not None:
+                last_pose_data = pose_data
+
             _draw_pose_status(annotated_frame, pose_data)
 
             cv2.imshow("PoseGuard - Vision", annotated_frame)
 
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
+            key = cv2.waitKey(1) & 0xFF
+
+            # q 누르면 현재까지 감지된 자세 반환
+            if key == ord("q"):
+                return last_pose_data
+
     finally:
         detector.close()
         capture.release()
