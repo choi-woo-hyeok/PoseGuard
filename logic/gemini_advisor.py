@@ -18,7 +18,48 @@ import google.generativeai as genai
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.0-flash")
+
+
+# ──────────────────────────────────────────
+# Gemini 실패 시 기본 코멘트
+# ──────────────────────────────────────────
+
+def _get_issue_text(posture_result: dict) -> str:
+    issues = []
+    if posture_result.get("turtle_neck"):
+        issues.append("거북목")
+    if posture_result.get("round_shoulder"):
+        issues.append("라운드숄더")
+
+    if not issues:
+        return "자세 불균형"
+    return "와 ".join(issues)
+
+
+def _get_fallback_posture_comment(posture_result: dict) -> str:
+    issue_text = _get_issue_text(posture_result)
+    return (
+        f"{issue_text}이 감지되었습니다.\n"
+        "어깨와 상체 위치를 고정하고, 턱을 살짝 당긴 뒤 허리를 세워주세요.\n"
+        "카메라와의 거리를 유지한 상태에서 다시 측정해보세요."
+    )
+
+
+def _get_fallback_session_summary(session_data: dict) -> str:
+    score = session_data.get("posture_score")
+    warning_count = session_data.get("warning_count", 0)
+
+    if score is None:
+        return (
+            f"이번 측정에서 자세 경고가 {warning_count}회 기록되었습니다.\n"
+            "다음 측정에서는 어깨와 상체 위치를 고정하고 바른 자세를 유지해보세요."
+        )
+
+    return (
+        f"이번 측정의 자세 점수는 {score}점이고, 경고 횟수는 {warning_count}회입니다.\n"
+        "다음 측정에서는 턱을 살짝 당기고 어깨를 편 상태를 유지해보세요."
+    )
 
 
 # ──────────────────────────────────────────
@@ -42,13 +83,7 @@ def get_posture_comment(posture_result: dict) -> str:
     if not posture_result.get("is_bad_posture"):
         return "자세가 좋습니다! 계속 유지해주세요 😊"
 
-    issues = []
-    if posture_result.get("turtle_neck"):
-        issues.append("거북목")
-    if posture_result.get("round_shoulder"):
-        issues.append("라운드숄더")
-
-    issue_str = "와 ".join(issues)
+    issue_str = _get_issue_text(posture_result)
 
     prompt = f"""
 당신은 자세 교정 전문가입니다.
@@ -64,7 +99,8 @@ def get_posture_comment(posture_result: dict) -> str:
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
-        return f"[Gemini 오류] {e}"
+        print("Gemini comment failed:", repr(e))
+        return _get_fallback_posture_comment(posture_result)
 
 
 # ──────────────────────────────────────────
@@ -110,7 +146,8 @@ def get_session_summary(session_data: dict) -> str:
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
-        return f"[Gemini 오류] {e}"
+        print("Gemini summary failed:", repr(e))
+        return _get_fallback_session_summary(session_data)
 
 
 # ──────────────────────────────────────────
