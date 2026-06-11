@@ -114,6 +114,14 @@ PoseGuard
 │   ├── camera.py
 │   └── pose_detector.py
 │
+├── docs
+│   ├── PoseGuard_사용자가이드.docx
+│   ├── PoseGuard_개발자가이드.docx
+│   ├── workflow.md
+│   ├── data_format.md
+│   ├── api_structure.md
+│   └── firebase_structure.md
+│
 ├── requirements.txt
 └── README.md
 ```
@@ -158,6 +166,13 @@ python -m vision.camera
 ```bash
 python backend/firebase_test.py
 ```
+
+---
+
+## 문서
+
+* [사용자 가이드](docs/PoseGuard_사용자가이드.docx)
+* [개발자 가이드](docs/PoseGuard_개발자가이드.docx)
 
 ---
 
